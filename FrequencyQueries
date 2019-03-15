@@ -1,0 +1,144 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Solution {
+
+    // Complete the freqQuery function below.
+    static List<int> freqQuery(List<List<int>> queries) {
+        var mapCount = new Dictionary<int, int>();
+        var mapNums = new Dictionary<int, List<int>>();
+        var resultArr = new List<int>();
+
+        for(int i = 0; i < queries.Count; i++)
+        {
+            var query = queries[i];
+            var operation = query[0];
+            var operand = query[1];
+
+            if(operation == 1) //add
+            {
+                if(!mapCount.ContainsKey(operand))
+                {
+                    mapCount.Add(operand, 1);
+                    if(!mapNums.ContainsKey(1))
+                    {
+                        var tempList = new List<int>();
+                        tempList.Add(operand);
+                        mapNums.Add(1, tempList);
+                    }
+                    else
+                    {
+                        mapNums[1].Add(operand);
+                    }
+                }
+                else
+                {
+                    var currentFreq = mapCount[operand];
+                    mapCount[operand]++;
+
+                    var currentNumsList = mapNums[currentFreq];
+                    currentNumsList.Remove(operand);
+                    mapNums[currentFreq] = currentNumsList;
+
+                    if(currentNumsList.Count ==0)
+                    {
+                        mapNums.Remove(currentFreq);
+                    }
+
+                    if(!mapNums.ContainsKey(mapCount[operand]))
+                    {
+                        var tempList = new List<int>();
+                        tempList.Add(operand);
+                        mapNums.Add(mapCount[operand], tempList);
+                    }
+                    else
+                    {
+                        mapNums[mapCount[operand]].Add(operand);
+                    }
+                }
+            }
+
+            if(operation == 2)
+            {
+                if(!mapCount.ContainsKey(operand))
+                {
+                    continue;
+                }
+                else
+                {
+                    var currentFreq = mapCount[operand];
+                    mapCount[operand]--;
+                    var currentNumsList = mapNums[currentFreq];
+                    currentNumsList.Remove(operand);
+                    mapNums[currentFreq] = currentNumsList;
+
+                    if(currentNumsList.Count == 0)
+                    {
+                        mapNums.Remove(currentFreq);
+                    }
+
+                    if(mapCount[operand] == 0)
+                    {
+                        mapCount.Remove(operand);
+                        continue;
+                    }
+                    if(!mapNums.ContainsKey(mapCount[operand]))
+                    {
+                        var tempList = new List<int>();
+                        tempList.Add(operand);
+                        mapNums.Add(mapCount[operand],tempList);
+                    }
+                    else
+                    {
+                        mapNums[mapCount[operand]].Add(operand);
+                    }
+                }
+            }
+
+            if(operation == 3)
+            {
+                if(!mapNums.ContainsKey(operand))
+                {
+                    resultArr.Add(0);
+                }
+                else 
+                {
+                    resultArr.Add(1);
+                }
+            }
+        }
+
+        return resultArr;
+
+    }
+
+    static void Main(string[] args) {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        int q = Convert.ToInt32(Console.ReadLine().Trim());
+
+        List<List<int>> queries = new List<List<int>>();
+
+        for (int i = 0; i < q; i++) {
+            queries.Add(Console.ReadLine().TrimEnd().Split(' ').ToList().Select(queriesTemp => Convert.ToInt32(queriesTemp)).ToList());
+        }
+
+        List<int> ans = freqQuery(queries);
+
+        textWriter.WriteLine(String.Join("\n", ans));
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
