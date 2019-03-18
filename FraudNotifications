@@ -1,0 +1,139 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Solution {
+
+    static double calculateMedian(int[] trailingArr, int[] countArr)
+    {
+        int[] countPositionArr = new int[201];
+
+        int sum = 0;
+        double median = 0;
+        int d = trailingArr.Length;
+        for(int i = 0; i<201; i++)
+        {
+            sum = sum + countArr[i];
+            countPositionArr[i] = sum;
+        }
+
+        print(countPositionArr, "countPositionArr");
+        if(d%2 != 0)
+        {
+            for(int i = d-1; i>=0; i--)
+            {
+                Console.WriteLine("trailingArr value: " + trailingArr[i]);
+                Console.WriteLine("comparing to : "+ countPositionArr[trailingArr[i]-1]);
+
+            //    output[countPositionArr[trailingArr[i]]-1]
+
+                if((countPositionArr[trailingArr[i]]-1) == (d/2))
+                {
+                    median = (double)trailingArr[i];
+                    break;
+                }
+               countPositionArr[trailingArr[i]]--;
+            }
+        }
+        else {
+            int first = d/2;
+            int second = first-1;
+            for(int i = d-1; i>=0; i--)
+            {
+                if((countPositionArr[trailingArr[i]]-1) == first)
+                {
+                    first = trailingArr[i];
+                }
+                if((countPositionArr[trailingArr[i]]-1) == second)
+                {
+                    second = trailingArr[i];
+                }
+                countPositionArr[trailingArr[i]]--;
+            }
+            Console.WriteLine("First: " + first);
+            Console.WriteLine("Second: " + second);
+            median = (double)(first + second)/2;
+        }
+        Console.WriteLine("Median is: " + median);
+        return median;
+    }
+
+    static void print(int[] arr, string name)
+    {
+        Console.WriteLine("Printing " + name);
+        for(int i = 0; i< arr.Length; i++)
+        {
+            Console.Write(arr[i] + " ");
+        }
+        Console.WriteLine();
+    }
+
+    // Complete the activityNotifications function below.
+    static int activityNotifications(int[] expenditure, int d) 
+    {
+        int notifications = 0;
+
+        int[] trailingArr = new int[d];
+        for(int i = 0; i < d; i++)
+        {
+            trailingArr[i] = expenditure[i];
+        }
+
+        int[] countArr = new int[201];
+        for(int i = 0; i < d; i++)
+        {
+            countArr[trailingArr[i]]++;
+        }
+
+        for(int i = d; i < expenditure.Length; i++)
+        {
+            //print(trailingArr, "trailingArr");
+            //print(countArr, "countArr");
+            
+            double median = calculateMedian(trailingArr, countArr);
+            if((double)expenditure[i] >= (2*median))
+            {
+                notifications++;
+            }
+            countArr[trailingArr[0]]--;
+            for(int j = 0; j < d-1; j++)
+            {
+                trailingArr[j] = trailingArr[j+1];
+            }
+            trailingArr[d-1] = expenditure[i];
+            countArr[trailingArr[d-1]]++;
+        }
+
+        return notifications;
+
+    }
+
+    static void Main(string[] args) {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string[] nd = Console.ReadLine().Split(' ');
+
+        int n = Convert.ToInt32(nd[0]);
+
+        int d = Convert.ToInt32(nd[1]);
+
+        int[] expenditure = Array.ConvertAll(Console.ReadLine().Split(' '), expenditureTemp => Convert.ToInt32(expenditureTemp))
+        ;
+        int result = activityNotifications(expenditure, d);
+
+        textWriter.WriteLine(result);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
