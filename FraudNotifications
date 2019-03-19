@@ -14,108 +14,74 @@ using System;
 
 class Solution {
 
-    static double calculateMedian(int[] trailingArr, int[] countArr)
+    static double calculateMedian(Queue<int> trailingQueue, int[] countArr)
     {
         int[] countPositionArr = new int[201];
+        //needed since arrays are reference types in c#
 
         int sum = 0;
         double median = 0;
-        int d = trailingArr.Length;
+        int d = trailingQueue.Count;
+        List<int> trailingList = new List<int>();
+        trailingList = trailingQueue.ToList();
+
+        int[] output = new int[d];
+
         for(int i = 0; i<201; i++)
         {
             sum = sum + countArr[i];
             countPositionArr[i] = sum;
         }
 
-        print(countPositionArr, "countPositionArr");
+        for(int i = d-1; i>=0; i--)
+        {
+            output[countPositionArr[trailingList[i]]-1] = trailingList[i];
+            countPositionArr[trailingList[i]]--;
+        }
+
         if(d%2 != 0)
         {
-            for(int i = d-1; i>=0; i--)
-            {
-                Console.WriteLine("trailingArr value: " + trailingArr[i]);
-                Console.WriteLine("comparing to : "+ countPositionArr[trailingArr[i]-1]);
-
-            //    output[countPositionArr[trailingArr[i]]-1]
-
-                if((countPositionArr[trailingArr[i]]-1) == (d/2))
-                {
-                    median = (double)trailingArr[i];
-                    break;
-                }
-               countPositionArr[trailingArr[i]]--;
-            }
+            median = (double)output[d/2];
+            return median;
         }
         else {
             int first = d/2;
             int second = first-1;
-            for(int i = d-1; i>=0; i--)
-            {
-                if((countPositionArr[trailingArr[i]]-1) == first)
-                {
-                    first = trailingArr[i];
-                }
-                if((countPositionArr[trailingArr[i]]-1) == second)
-                {
-                    second = trailingArr[i];
-                }
-                countPositionArr[trailingArr[i]]--;
-            }
-            Console.WriteLine("First: " + first);
-            Console.WriteLine("Second: " + second);
-            median = (double)(first + second)/2;
+            median = (double)(output[first] + output[second])/2;
         }
-        Console.WriteLine("Median is: " + median);
         return median;
-    }
-
-    static void print(int[] arr, string name)
-    {
-        Console.WriteLine("Printing " + name);
-        for(int i = 0; i< arr.Length; i++)
-        {
-            Console.Write(arr[i] + " ");
-        }
-        Console.WriteLine();
     }
 
     // Complete the activityNotifications function below.
     static int activityNotifications(int[] expenditure, int d) 
     {
         int notifications = 0;
+        Queue<int> trailingQueue = new Queue<int>();
 
-        int[] trailingArr = new int[d];
         for(int i = 0; i < d; i++)
         {
-            trailingArr[i] = expenditure[i];
+            trailingQueue.Enqueue(expenditure[i]);
         }
 
         int[] countArr = new int[201];
         for(int i = 0; i < d; i++)
         {
-            countArr[trailingArr[i]]++;
+            countArr[expenditure[i]]++;
         }
 
         for(int i = d; i < expenditure.Length; i++)
-        {
-            //print(trailingArr, "trailingArr");
-            //print(countArr, "countArr");
-            
-            double median = calculateMedian(trailingArr, countArr);
+        {            
+            double median = calculateMedian(trailingQueue, countArr);
             if((double)expenditure[i] >= (2*median))
             {
                 notifications++;
             }
-            countArr[trailingArr[0]]--;
-            for(int j = 0; j < d-1; j++)
-            {
-                trailingArr[j] = trailingArr[j+1];
-            }
-            trailingArr[d-1] = expenditure[i];
-            countArr[trailingArr[d-1]]++;
+            countArr[trailingQueue.Peek()]--;
+            trailingQueue.Dequeue();
+            trailingQueue.Enqueue(expenditure[i]);
+            countArr[expenditure[i]]++;
         }
-
         return notifications;
-
     }
 
     static void Main(string[] args) {
