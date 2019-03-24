@@ -14,74 +14,79 @@ using System;
 
 class Solution {
 
-    static double calculateMedian(Queue<int> trailingQueue, int[] countArr)
+    static float getMedian(int[] freq, int d)
     {
-        int[] countPositionArr = new int[201];
-        //needed since arrays are reference types in c#
-
-        int sum = 0;
-        double median = 0;
-        int d = trailingQueue.Count;
-        List<int> trailingList = new List<int>();
-        trailingList = trailingQueue.ToList();
-
-        int[] output = new int[d];
-
-        for(int i = 0; i<201; i++)
+        int middle =0;
+        if(d%2 == 1)
         {
-            sum = sum + countArr[i];
-            countPositionArr[i] = sum;
+            for(int i = 0; i<freq.Length; i++)
+            {
+                middle = middle + freq[i];
+                if(middle > (d/2))
+                {
+                    middle = i;
+                    break;
+                }
+            }
+            return middle;
         }
 
-        for(int i = d-1; i>=0; i--)
-        {
-            output[countPositionArr[trailingList[i]]-1] = trailingList[i];
-            countPositionArr[trailingList[i]]--;
-        }
+        int first = -1;
+        int second = -1;
+        float answer = 0;
 
-        if(d%2 != 0)
+        for(int i = 0; i< freq.Length; i++)
         {
-            median = (double)output[d/2];
-            return median;
+            middle = middle + freq[i];
+            if(middle == d/2)
+            {
+                first = i;
+            }
+            if(middle > (d/2))
+            {
+                second = i;
+                if(first < 0)
+                {
+                    first = i;
+                }
+
+                answer = ((float)first+(float)second)/2;
+                break;
+            }
         }
-        else {
-            int first = d/2;
-            int second = first-1;
-            median = (double)(output[first] + output[second])/2;
-        }
-        return median;
+        return answer;
     }
 
     // Complete the activityNotifications function below.
     static int activityNotifications(int[] expenditure, int d) 
-    {
-        int notifications = 0;
-        Queue<int> trailingQueue = new Queue<int>();
+    {   
+        int notificationCount = 0;
+        Queue<int> q = new Queue<int>();
+        int[]freq = new int[201];
 
-        for(int i = 0; i < d; i++)
+        for(int i=0; i<expenditure.Length; i++)
         {
-            trailingQueue.Enqueue(expenditure[i]);
-        }
-
-        int[] countArr = new int[201];
-        for(int i = 0; i < d; i++)
-        {
-            countArr[expenditure[i]]++;
-        }
-
-        for(int i = d; i < expenditure.Length; i++)
-        {            
-            double median = calculateMedian(trailingQueue, countArr);
-            if((double)expenditure[i] >= (2*median))
+            while(i < d)
             {
-                notifications++;
+                q.Enqueue(expenditure[i]);
+                freq[expenditure[i]]++;
+                i++;
             }
-            countArr[trailingQueue.Peek()]--;
-            trailingQueue.Dequeue();
-            trailingQueue.Enqueue(expenditure[i]);
-            countArr[expenditure[i]]++;
-        }
-        return notifications;
+
+            float median = getMedian(freq, d);
+            
+            q.Enqueue(expenditure[i]);
+            freq[expenditure[i]]++;
+            if((float)expenditure[i] >= (2*median))
+            {
+                notificationCount++;
+            }
+
+            int last = q.Dequeue();
+            freq[last]--;
+    }
+    return notificationCount;
+
     }
 
     static void Main(string[] args) {
