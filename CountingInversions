@@ -14,77 +14,49 @@ using System;
 
 class Solution {
 
-    static void print(int[] arr, string name)
-    {
-        Console.WriteLine("Printing " + name);
-        for(int i = 0; i < arr.Length; i++)
-        {
-            Console.Write(arr[i] + " ");
-        }
-
-        Console.WriteLine();
-    }
-
-    static long mergeHalvesCount(int[] array, int[] temp, int leftStart, int rightEnd)
+    static long mergeHalvesCount(int[] array, int[] temp, int leftStart, int middle, int rightEnd)
     {
         long count = 0;
-        int leftEnd  = (rightEnd + leftStart)/2;
-        int rightStart = leftEnd +1;
-        int size = rightEnd - leftStart +1;
-
         int left = leftStart;
-        int right = rightStart;
-        int index = leftStart;
+        int right = middle + 1;
+        int index = leftStart; 
 
-        while(left <= leftEnd && right <= rightEnd)
-        {
-            if(array[left] <= array[right])
-            {
-                temp[index] = array[left];
-                //Console.WriteLine("Updated from Left");
-                //print(temp, "temp");
-                index++;
-                left++;
+        while (left <= middle || right <= rightEnd) {
+            if (left > middle) {
+                array[index++] = temp[right++];
+            } 
+            else if (right > rightEnd) {
+                array[index++] = temp[left++];
+            } 
+            else if (temp[left] <= temp[right]) {
+                array[index++] = temp[left++];
+            } 
+            else {
+                array[index++] = temp[right++];
+                count += middle + 1 - left;
             }
-            else 
-            {
-                temp[index] = array[right];
-                count += leftEnd - index + 1;
-                Console.WriteLine("Updated from Right");
-                Console.WriteLine("Updated Count: " + count);
-                print(temp, "temp");
-                right++;
-                index++;
-            }
-        }
-
-        if(left > leftEnd)
-        {
-            Array.Copy(array, right, temp, index, rightEnd - right+1);
-        }
-        if(right > rightEnd){
-            Array.Copy(array, left, temp, index, leftEnd - left+1);
         }
         return count;
     }
 
     static long mergeSortCount(int[] array, int[] temp, int leftStart, int rightEnd)
     { 
-        long count = 0;
         if(leftStart >= rightEnd)
         {
             return 0;
         }
-        int middle = (leftStart + rightEnd)/2;
-        count = count + mergeSortCount(array, temp, leftStart, middle);
-        count = count + mergeSortCount(array, temp, middle+1, rightEnd);
-        count = count + mergeHalvesCount(array, temp, leftStart, rightEnd);
+
+        long count = 0;
+        int middle = leftStart  + (rightEnd - leftStart)/2;
+        count = count + mergeSortCount(temp, array, leftStart, middle);
+        count = count + mergeSortCount(temp, array, middle +1, rightEnd);
+        count = count + mergeHalvesCount(array, temp, leftStart, middle, rightEnd);
         return count;
     }
 
     static long countInversions(int[] arr) {
 
-        int[] temp = new int[arr.Length];
+        int[] temp = (int[])arr.Clone();
         long count = mergeSortCount(arr, temp, 0, arr.Length-1);
         return count;        
     }
