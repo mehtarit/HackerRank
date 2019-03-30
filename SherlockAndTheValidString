@@ -14,16 +14,6 @@ using System;
 
 class Solution {
 
-    static void print(int[] arr, string name)
-    {
-        Console.WriteLine("Printing " + name);
-        foreach(int i in arr)
-        {
-            Console.Write(i + " ");
-        }
-        Console.WriteLine();
-    }
-
     // Complete the isValid function below.
     static string isValid(string s) {
         if(s.Length < 2) return "YES";
@@ -38,8 +28,6 @@ class Solution {
         {
             freq[s[i]-'a']++;
         }
-
-        print(freq, "freq");
 
         for(int i = 0; i<26; i++)
         {
@@ -58,12 +46,10 @@ class Solution {
             }         
         }
 
-       Console.WriteLine("Printing dictionary");
-        foreach(KeyValuePair<int,int> i in frequencies)
+        if(frequencies.Count == 1)
         {
-            Console.WriteLine(i.Key + " " + i.Value);
+            return "YES";
         }
-        Console.WriteLine();
 
         if(frequencies.Count > 2)
         {
@@ -74,20 +60,29 @@ class Solution {
         {
             freqList.Add(i.Key);
         }
-
         
-        print(freqList.ToArray(), "freqList");
-
-     /*   if(Math.Abs(freqList[0] - freqList[1]) > 1)
+       if(Math.Abs(freqList[0] - freqList[1]) > 1)
         {
+            if(freqList[0] ==1 || freqList[1] == 1)
+            {
+                if(freq[0] == 1 && frequencies[freqList[0]] > 1)
+                {
+                    return "NO";
+                }
+
+                if(freq[1] == 1 && frequencies[freqList[1]] > 1)
+                {
+                    return "NO";
+                }
+                return "YES";
+            }
             return "NO";
-        }*/
+        }
         
         if(frequencies[freqList[0]] == 1 || frequencies[freqList[1]] == 1)
         {
             return "YES";
         }
-
         else return "NO";
 
         return "YES";
