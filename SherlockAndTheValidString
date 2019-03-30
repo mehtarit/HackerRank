@@ -1,0 +1,84 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Solution {
+
+    // Complete the isValid function below.
+    static string isValid(string s) {
+
+        Dictionary<int, int> frequencies = new Dictionary<int, int>();
+        List<int> freqList = new List<int>();
+
+        int[] freq = new int[26];
+        //a to be stored in 0
+
+        for(int i = 0; i < s.Length; i++)
+        {
+            freq[s[i]-'a']++;
+        }
+
+        for(int i = 0; i<26; i++)
+        {
+            if(freq[i] == 0)
+            {
+                continue;
+            }
+
+            if(!frequencies.ContainsKey(freq[i]))
+            {
+                frequencies.Add(freq[i], 1);
+            } 
+            else 
+            {
+                frequencies[freq[i]]++; 
+            }         
+        }
+
+        if(frequencies.Count > 2)
+        {
+            return "NO";
+        }
+
+        foreach(KeyValuePair<int,int> i in frequencies)
+        {
+            freqList.Add(i.Key);
+        }
+
+        if(Math.Abs(freqList[0] - freqList[1]) > 1)
+        {
+            return "NO";
+        }
+        
+        if(frequencies[freqList[0]] == 1 || frequencies[freqList[1]] == 1)
+        {
+            return "YES";
+        }
+        else return "NO";
+
+        return "YES";
+    }
+
+    static void Main(string[] args) {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string s = Console.ReadLine();
+
+        string result = isValid(s);
+
+        textWriter.WriteLine(result);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
