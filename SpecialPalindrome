@@ -16,11 +16,14 @@ class Solution {
 
     static bool IsSpecialPalindrome(string s)
     {
-        if(s.Length != 2)
+        //Console.WriteLine("Evaluating incoming String: " + s);
+        if(s.Length != 2 && s.Length %2 !=0)
         {
             int midIndex = s.Length/2;
-            s.Remove(midIndex, 1);
+            s = s.Remove(midIndex, 1);
         }
+
+       // Console.WriteLine("Evaluating Modified String: " + s);
 
         char compare = s[0];
 
@@ -41,7 +44,7 @@ class Solution {
     static long substrCount(int n, string s) {
         int count = 0;
 
-        if(n == 1) return 1;
+        if(n < 2) return n;
 
         int subStringLenght = 2;
 
@@ -49,23 +52,32 @@ class Solution {
         {
             for(int i=0; i < n; i++)
             {
-                int maxIndex = i + subStringLenght;
+                int maxIndex = i + subStringLenght -1;
+              //  Console.WriteLine("CurrentIndex is: " + i);
+               // Console.WriteLine("MaxIndex is: " + maxIndex);
                 if(maxIndex > n-1)
                 {
                     break;
                 }
 
                 string currentSubstring = s.Substring(i, subStringLenght);
-                Console.WriteLine("Current Substring: " + currentSubstring);
+                //Console.WriteLine("Current Substring: " + currentSubstring);
                 if(IsSpecialPalindrome(currentSubstring))
                 {
+                   // Console.Write("Is a special Palindrome");
+                    //Console.WriteLine();
                     count++;
                 }
             }
             subStringLenght++;
         }
 
-        return count + s.Length;
+        if(IsSpecialPalindrome(s))
+        {
+            count++;
+        }
+
+        return count + n;
 
     }
 
