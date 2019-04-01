@@ -14,70 +14,74 @@ using System;
 
 class Solution {
 
-    static bool IsSpecialPalindrome(string s)
+    static bool IsRepeating(string s)
     {
-        //Console.WriteLine("Evaluating incoming String: " + s);
-        if(s.Length != 2 && s.Length %2 !=0)
-        {
-            int midIndex = s.Length/2;
-            s = s.Remove(midIndex, 1);
-        }
-
-       // Console.WriteLine("Evaluating Modified String: " + s);
-
-        char compare = s[0];
+        char toCompare = s[0];
 
         foreach(char c in s)
         {
-            if(c == compare)
+            if(c != toCompare)
             {
-                continue;
+                return false;
             }
-
-            return false;
         }
 
         return true;
     }
 
+    static long PalindromeCount(string s, long count)
+    {
+        if(s.Length == 1)
+        {
+            count = count +1;
+            return count;
+        }
+
+        if(s.Length % 2 !=0)
+        {
+            int mid = s.Length/2;
+            string modified = s.Remove(mid, 1);
+            if(IsRepeating(modified))
+            {
+                count = count+1;
+                return count;
+            }
+        }
+
+        else if(s.Length % 2 == 0)
+        {
+            if(IsRepeating(s))
+            {
+                count = count + 1;
+                return count;
+            }
+        }
+
+        return count;
+    }
+
     // Complete the substrCount function below.
     static long substrCount(int n, string s) {
-        int count = 0;
 
-        if(n < 2) return n;
+        long count = 0;
+        int maxOffset = n;
 
-        int subStringLenght = 2;
+        for(int i = 0; i < n; i++)
+        {           
+            int offset = 1;
 
-        while(subStringLenght < n)
-        {
-            for(int i=0; i < n; i++)
+            while(offset <= maxOffset)
             {
-                int maxIndex = i + subStringLenght -1;
-              //  Console.WriteLine("CurrentIndex is: " + i);
-               // Console.WriteLine("MaxIndex is: " + maxIndex);
-                if(maxIndex > n-1)
-                {
-                    break;
-                }
-
-                string currentSubstring = s.Substring(i, subStringLenght);
-                //Console.WriteLine("Current Substring: " + currentSubstring);
-                if(IsSpecialPalindrome(currentSubstring))
-                {
-                   // Console.Write("Is a special Palindrome");
-                    //Console.WriteLine();
-                    count++;
-                }
+                string current = s.Substring(i, offset);
+                Console.WriteLine("Current substring is: " + current);
+                count = PalindromeCount(current, count);
+                offset++;
             }
-            subStringLenght++;
+
+            maxOffset--;
         }
 
-        if(IsSpecialPalindrome(s))
-        {
-            count++;
-        }
-
-        return count + n;
+    return count;
 
     }
 
