@@ -13,76 +13,147 @@ using System.Text;
 using System;
 
 class Solution {
+    static string s;
+    static HashSet<string> subStringMap = new HashSet<string>();
 
-    static bool IsRepeating(string s)
+    static bool IsRepeating(string sub)
     {
-        char toCompare = s[0];
-
-        foreach(char c in s)
+        char toCompare = sub[0];
+        foreach(char c in sub)
         {
             if(c != toCompare)
             {
                 return false;
             }
         }
-
         return true;
     }
 
-    static long PalindromeCount(string s, long count)
+    static string GetHash(int start, int end)
     {
-        if(s.Length == 1)
-        {
-            count = count +1;
-            return count;
-        }
-
-        if(s.Length % 2 !=0)
-        {
-            int mid = s.Length/2;
-            string modified = s.Remove(mid, 1);
-            if(IsRepeating(modified))
-            {
-                count = count+1;
-                return count;
-            }
-        }
-
-        else if(s.Length % 2 == 0)
-        {
-            if(IsRepeating(s))
-            {
-                count = count + 1;
-                return count;
-            }
-        }
-
-        return count;
+        return start.ToString() + "-" + end.ToString();
     }
 
-    // Complete the substrCount function below.
-    static long substrCount(int n, string s) {
-
+    static long substrCounter(int start, int end)
+    {
         long count = 0;
-        int maxOffset = n;
-
-        for(int i = 0; i < n; i++)
-        {           
-            int offset = 1;
-
-            while(offset <= maxOffset)
+        int strLength = end - start + 1;
+        if(strLength == 1)
+        {
+            string subStr = s.Substring(start, strLength);
+            Console.WriteLine("Length is 1 for string: " + subStr);
+            string hash = GetHash(start, end);
+            if(!subStringMap.Contains(hash))
             {
-                string current = s.Substring(i, offset);
-                Console.WriteLine("Current substring is: " + current);
-                count = PalindromeCount(current, count);
-                offset++;
+                subStringMap.Add(hash);
+                count = count +1;
+            }
+        }
+        else if(strLength %2 == 0) //if even length
+        {            
+            string subStr = s.Substring(start, strLength);
+            Console.WriteLine("Length is even for string: " + subStr);
+            if(IsRepeating(subStr))
+            {
+                string hash = GetHash(start, end);
+                if(!subStringMap.Contains(hash))
+                {
+                    subStringMap.Add(hash);
+                    count = count + ((long)strLength*((long)strLength+1))/2; 
+                }
+                
+            }
+            else
+            {
+                int newStrLength = strLength -1;
+                if(strLength != 0)
+                {
+                    int newEnd = start + newStrLength -1;
+                    int newStart = end - newStrLength +1;
+
+                    count = count + substrCounter(start, newEnd);
+                    count = count + substrCounter(newStart, end);
+                }
+            }
+        }
+        else
+        {
+            int mid = strLength/2;
+            string subStr = s.Substring(start, strLength);
+            Console.WriteLine("Length is odd for string: " + subStr);
+            char toCompare = subStr[0];
+            bool repeats = true;
+
+            for(int i = 0; i < mid; i++)
+            {
+                if(subStr[i] != toCompare)
+                {
+                    repeats = false;
+                    break;
+                }
             }
 
-            maxOffset--;
+            for(int i = mid+1; i < strLength; i++)
+            {
+                if(subStr[i] != toCompare)
+                {
+                    repeats = false;
+                    break;
+                }
+            }
+
+            if(repeats == true)
+            {
+                if(subStr[mid] == toCompare)
+                {
+                    string hash = GetHash(start, end);
+                    if(!subStringMap.Contains(hash))
+                    {
+                        subStringMap.Add(hash);
+                        count = count + ((strLength)*(strLength+1))/2;
+                    }
+                }
+                else
+                {
+                    string hash = GetHash(start, end);
+                    if(!subStringMap.Contains(hash))
+                    {
+                        subStringMap.Add(hash);
+                        count = count +1;
+                    }
+
+                    int newStrLength = strLength -1;
+                    if(strLength != 0)
+                    {
+                        int newEnd = start + newStrLength -1;
+                        int newStart = end - newStrLength +1;
+
+                        count = count + substrCounter(start, newEnd);
+                        count = count + substrCounter(newStart, end);
+                    }
+                }
+            }
+            else 
+            {
+                int newStrLength = strLength -1;
+                if(strLength != 0)
+                {
+                    int newEnd = start + newStrLength -1;
+                    int newStart = end - newStrLength +1;
+
+                    count = count + substrCounter(start, newEnd);
+                    count = count + substrCounter(newStart, end);
+                }
+            }
+            
         }
 
-    return count;
-
+        return count; 
+    }
+    // Complete the substrCount function below.
+    static long substrCount(int n) {
+        long count = substrCounter(0, n-1);
+        return count;
     }
 
     static void Main(string[] args) {
@@ -90,9 +161,9 @@ class Solution {
 
         int n = Convert.ToInt32(Console.ReadLine());
 
-        string s = Console.ReadLine();
+        s = Console.ReadLine();
 
-        long result = substrCount(n, s);
+        long result = substrCount(n);
 
         textWriter.WriteLine(result);
 
