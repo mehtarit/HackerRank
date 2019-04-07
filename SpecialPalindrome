@@ -1,141 +1,55 @@
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Text;
-using System;
+#include <bits/stdc++.h>
 
-class Solution {
+using namespace std;
 
-    static bool IsRepeating(string s)
+// Complete the substrCount function below.
+long substrCount(int n, string s) {
+
+long count = 0;
+vector<std::pair<char, int>> frequencies;
+int i=0, j=0;
+
+for ( i = 0; i < n; i++)
+{
+    for( j = i+1; j < n; j++)
     {
-        char toCompare = s[0];
-        foreach(char c in s)
-        {
-            if (c != toCompare)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        if (s[j] == s[i])
+            continue;
+        else
+            break;
     }
+    frequencies.push_back(std::make_pair(s[i],j-i));
+    i = j-1;
+}
 
-    static bool IsPalindrome(string s)
-    {
-        int mid = s.Length/2;
-        string firstHalf = s.Substring(0, mid - 0);
-        string secondHalf = s.Substring(mid+1, s.Length - (mid + 1));
-      //  Console.WriteLine("s is: " + s);
-       // Console.WriteLine("firstHalf is: " + firstHalf);
-        //Console.WriteLine("secondHalf is: " + secondHalf);
-        if(IsRepeating(firstHalf) && IsRepeating(secondHalf))
-        {
-            if(firstHalf == secondHalf)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+for (i=0; i < frequencies.size(); i++)
+    count += (frequencies[i].second+1) * frequencies[i].second / 2;
 
-    static bool IsRepeatingPalindrome(string s)
-    {
-        int mid = s.Length/2;
-        char toCompare = s[0];
-        if(s[mid] == s[0])
-        {
-            return true;
-        }
-        return false;
-    }
+for (i=1; i < frequencies.size()-1; i++)
+{
+    if ( frequencies[i].second == 1 && frequencies[i-1].first == frequencies[i+1].first)
+        count += min(frequencies[i-1].second, frequencies[i+1].second);
+}
 
-    static long GetPalindromeCount(string s, ref bool repeats)
-    {
-        repeats = false;
-        if(s.Length == 1)
-        {
-           // Console.WriteLine(s + " is a palindrome and count is " + 1);
-            return 1;
-        }
+return count;
+}
 
-        if(s.Length %2 == 0)
-        {
-            if(IsRepeating(s))
-            {
-                repeats = true;
-            //    Console.WriteLine(s + " is a palindrome and count is " + (s.Length*(s.Length + 1))/2);
-                return (s.Length*(s.Length + 1))/2;
-            }
-            return 0;            
-        }
+int main()
+{
+    ofstream fout(getenv("OUTPUT_PATH"));
 
-        if(IsPalindrome(s))
-        {
-            if(IsRepeatingPalindrome(s))
-            {
-                repeats = true;
-          //      Console.WriteLine(s + " is a palindrome and count is " + (s.Length*(s.Length + 1))/2);
-                return (s.Length*(s.Length + 1))/2;
-            }
-        //    Console.WriteLine(s + " is a palindrome and count is " + 1);
-            return 1;
-        }
-        return 0;
-    }
-    // Complete the substrCount function below.
-    static long substrCount(int n, string s) {
+    int n;
+    cin >> n;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-        long count = 0;
-        bool IsFirst = false;
+    string s;
+    getline(cin, s);
 
-        for(int i = 0; i < n; i++)
-        {
-            int last = n-1;
-            while(last >=i)
-            {
-                bool repeats = false;
-                int subStrLength = last - i +1;
-                string current = s.Substring(i, subStrLength);
-                count = count + GetPalindromeCount(current, ref repeats);
-                if(repeats)
-                {
-                    if(i == 0)
-                    {
-                        IsFirst = true;
-                    }
-                    break;
-                }
-                last--;
-            }
-            if(IsFirst) 
-            {
-                break;
-            }
-        }
+    long result = substrCount(n, s);
 
-        return count;
-    }
+    fout << result << "\n";
 
-    static void Main(string[] args) {
-        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+    fout.close();
 
-        int n = Convert.ToInt32(Console.ReadLine());
-
-        string s = Console.ReadLine();
-
-        long result = substrCount(n, s);
-
-        textWriter.WriteLine(result);
-
-        textWriter.Flush();
-        textWriter.Close();
-    }
+    return 0;
 }
