@@ -14,41 +14,102 @@ using System;
 
 class Solution {
 
+    static int FindMinLength(string s1, string s2)
+    {
+        if(s1.Length <= s2.Length)
+        {
+            return s1.Length;
+        }
+        return s2.Length;
+    }
+
     // Complete the commonChild function below.
     static int commonChild(string s1, string s2) {
-        HashSet<char> s1Set = new HashSet<char>();
-        HashSet<char> s2Set = new HashSet<char>();
+            HashSet<char> s1Map = new HashSet<char>();
+            HashSet<char> s2Map = new HashSet<char>();
 
-        foreach(char c in s1)
-        {
-            if(s1Set.Contains(c))
+            string compare1 = "";
+            string compare2 = "";
+
+            foreach(char c in s1)
             {
-                continue;
+                if(!s1Map.Contains(c))
+                {
+                    s1Map.Add(c);
+                }
             }
 
-            s1Set.Add(c);
-        }
-
-        foreach(char c in s2)
-        {
-            if(!s1Set.Contains(c))
+            foreach(char c in s2)
             {
-                continue;
+                if(s1Map.Contains(c))
+                {
+                    s2Map.Add(c);
+                    compare2 = compare2 + c.ToString();
+                }
             }
 
-            s2Set.Add(c);
-        }
-
-        foreach(char c in s1)
-        {
-            if(s2Set.ContainsKey(c))
+            foreach(char c in s1)
             {
-                continue;
+                if(s2Map.Contains(c))
+                {
+                    compare1 = compare1 + c.ToString();
+                }
             }
 
-            s1Set.Remove(c);
-        }
+            Console.WriteLine("Compare1 is: " + compare1 + " Compare2 is: " + compare2);
+            if(compare1 == string.Empty || compare2 == string.Empty)
+            {
+                return 0;
+            }
+            if(compare1 == compare2)
+            {
+                return compare1.Length;
+            }
 
+         //   int count = 0;
+            int childLength = FindMinLength(compare1, compare2);
+            Console.WriteLine("Min Child Length is: " + childLength);
+            while(childLength != 0)
+            {
+                HashSet<string> PossiblyCommon = new HashSet<string>();
+                if(compare1.Length > childLength)
+                {
+                    for(int i = 0; i < compare1.Length; i++)
+                    {
+                        string s = compare1.Remove(i, 1);
+                        if(!PossiblyCommon.Contains(s))
+                        {
+                            PossiblyCommon.Add(s);
+                        }
+                    }
+                }
+                else 
+                {
+                    PossiblyCommon.Add(compare1);
+                }
+
+                if(compare2.Length > childLength)
+                {
+                    for(int i = 0; i < compare2.Length; i++)
+                    {
+                        string s = compare2.Remove(i,1);
+                        if(PossiblyCommon.Contains(s))
+                        {
+                            return childLength;
+                        }
+                    }
+                }
+                else
+                {
+                    if(PossiblyCommon.Contains(compare2))
+                    {
+                        return childLength;
+                    }
+                }
+                childLength--;
+            }
+            Console.WriteLine("Reached the end");
+            return 0;
     }
 
     static void Main(string[] args) {
