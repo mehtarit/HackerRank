@@ -13,146 +13,114 @@ using System.Text;
 using System;
 
 class Solution {
-    static string s;
-    static HashSet<string> subStringMap = new HashSet<string>();
 
-    static bool IsRepeating(string sub)
+    static bool IsRepeating(string s)
     {
-        char toCompare = sub[0];
-        foreach(char c in sub)
+        char toCompare = s[0];
+        foreach(char c in s)
         {
-            if(c != toCompare)
+            if (c != toCompare)
             {
                 return false;
             }
         }
+
         return true;
     }
 
-    static string GetHash(int start, int end)
+    static bool IsPalindrome(string s)
     {
-        return start.ToString() + "-" + end.ToString();
+        int mid = s.Length/2;
+        string firstHalf = s.Substring(0, mid - 0);
+        string secondHalf = s.Substring(mid+1, s.Length - (mid + 1));
+      //  Console.WriteLine("s is: " + s);
+       // Console.WriteLine("firstHalf is: " + firstHalf);
+        //Console.WriteLine("secondHalf is: " + secondHalf);
+        if(IsRepeating(firstHalf) && IsRepeating(secondHalf))
+        {
+            if(firstHalf == secondHalf)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
-    static long substrCounter(int start, int end)
+    static bool IsRepeatingPalindrome(string s)
     {
-        long count = 0;
-        int strLength = end - start + 1;
-        if(strLength == 1)
+        int mid = s.Length/2;
+        char toCompare = s[0];
+        if(s[mid] == s[0])
         {
-            string subStr = s.Substring(start, strLength);
-            Console.WriteLine("Length is 1 for string: " + subStr);
-            string hash = GetHash(start, end);
-            if(!subStringMap.Contains(hash))
-            {
-                subStringMap.Add(hash);
-                count = count +1;
-            }
+            return true;
         }
-        else if(strLength %2 == 0) //if even length
-        {            
-            string subStr = s.Substring(start, strLength);
-            Console.WriteLine("Length is even for string: " + subStr);
-            if(IsRepeating(subStr))
-            {
-                string hash = GetHash(start, end);
-                if(!subStringMap.Contains(hash))
-                {
-                    subStringMap.Add(hash);
-                    count = count + ((long)strLength*((long)strLength+1))/2; 
-                }
-                
-            }
-            else
-            {
-                int newStrLength = strLength -1;
-                if(strLength != 0)
-                {
-                    int newEnd = start + newStrLength -1;
-                    int newStart = end - newStrLength +1;
+        return false;
+    }
 
-                    count = count + substrCounter(start, newEnd);
-                    count = count + substrCounter(newStart, end);
-                }
-            }
-        }
-        else
+    static long GetPalindromeCount(string s, ref bool repeats)
+    {
+        repeats = false;
+        if(s.Length == 1)
         {
-            int mid = strLength/2;
-            string subStr = s.Substring(start, strLength);
-            Console.WriteLine("Length is odd for string: " + subStr);
-            char toCompare = subStr[0];
-            bool repeats = true;
-
-            for(int i = 0; i < mid; i++)
-            {
-                if(subStr[i] != toCompare)
-                {
-                    repeats = false;
-                    break;
-                }
-            }
-
-            for(int i = mid+1; i < strLength; i++)
-            {
-                if(subStr[i] != toCompare)
-                {
-                    repeats = false;
-                    break;
-                }
-            }
-
-            if(repeats == true)
-            {
-                if(subStr[mid] == toCompare)
-                {
-                    string hash = GetHash(start, end);
-                    if(!subStringMap.Contains(hash))
-                    {
-                        subStringMap.Add(hash);
-                        count = count + ((strLength)*(strLength+1))/2;
-                    }
-                }
-                else
-                {
-                    string hash = GetHash(start, end);
-                    if(!subStringMap.Contains(hash))
-                    {
-                        subStringMap.Add(hash);
-                        count = count +1;
-                    }
-
-                    int newStrLength = strLength -1;
-                    if(strLength != 0)
-                    {
-                        int newEnd = start + newStrLength -1;
-                        int newStart = end - newStrLength +1;
-
-                        count = count + substrCounter(start, newEnd);
-                        count = count + substrCounter(newStart, end);
-                    }
-                }
-            }
-            else 
-            {
-                int newStrLength = strLength -1;
-                if(strLength != 0)
-                {
-                    int newEnd = start + newStrLength -1;
-                    int newStart = end - newStrLength +1;
-
-                    count = count + substrCounter(start, newEnd);
-                    count = count + substrCounter(newStart, end);
-                }
-            }
-            
+           // Console.WriteLine(s + " is a palindrome and count is " + 1);
+            return 1;
         }
 
-        return count; 
+        if(s.Length %2 == 0)
+        {
+            if(IsRepeating(s))
+            {
+                repeats = true;
+            //    Console.WriteLine(s + " is a palindrome and count is " + (s.Length*(s.Length + 1))/2);
+                return (s.Length*(s.Length + 1))/2;
+            }
+            return 0;            
+        }
+
+        if(IsPalindrome(s))
+        {
+            if(IsRepeatingPalindrome(s))
+            {
+                repeats = true;
+          //      Console.WriteLine(s + " is a palindrome and count is " + (s.Length*(s.Length + 1))/2);
+                return (s.Length*(s.Length + 1))/2;
+            }
+        //    Console.WriteLine(s + " is a palindrome and count is " + 1);
+            return 1;
+        }
+        return 0;
     }
     // Complete the substrCount function below.
-    static long substrCount(int n) {
-        long count = substrCounter(0, n-1);
+    static long substrCount(int n, string s) {
+
+        long count = 0;
+        bool IsFirst = false;
+
+        for(int i = 0; i < n; i++)
+        {
+            int last = n-1;
+            while(last >=i)
+            {
+                bool repeats = false;
+                int subStrLength = last - i +1;
+                string current = s.Substring(i, subStrLength);
+                count = count + GetPalindromeCount(current, ref repeats);
+                if(repeats)
+                {
+                    if(i == 0)
+                    {
+                        IsFirst = true;
+                    }
+                    break;
+                }
+                last--;
+            }
+            if(IsFirst) 
+            {
+                break;
+            }
+        }
+
         return count;
     }
 
@@ -161,9 +129,9 @@ class Solution {
 
         int n = Convert.ToInt32(Console.ReadLine());
 
-        s = Console.ReadLine();
+        string s = Console.ReadLine();
 
-        long result = substrCount(n);
+        long result = substrCount(n, s);
 
         textWriter.WriteLine(result);
 
