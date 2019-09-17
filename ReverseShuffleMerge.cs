@@ -36,6 +36,11 @@ class Solution {
             minLimit.Add(c, (count[c]/2));
         }
 
+        Dictionary<char, int> howManyUsed = new Dictionary<char, int>();
+        foreach(char c in count.Keys)
+        {
+            howManyUsed.Add(c, 0);
+        }
 
         char[] A = new char[s.Length/2];
         int index_a = 0;
@@ -45,13 +50,15 @@ class Solution {
 
         for(int i = s.Length-1; i>=0; i--)
         {
-            if(index_a == (s.Length/2)) break;
+            if(index_a == (A.Length)) break;
             char current = s[i];
-            if(count[current] <= minLimit[current]) // if can't leave 
+            if(count[current] <=0) continue;
+            if(count[current] <= (minLimit[current]-howManyUsed[current])) // if can't leave 
             {
                 A[index_a] = current;
                 index_a++;
                 count[current]--;
+                howManyUsed[current]++;
             }
             else //if can leave
             {
@@ -61,8 +68,14 @@ class Solution {
                     A[index_a] = current;
                     index_a++;
                     count[current]--;
-                    sorted_list.Remove(current);   
+                    howManyUsed[current]++;  
                 }
+            }
+
+            //either way
+            if(howManyUsed[current] >= minLimit[current])
+            {
+                sorted_list.Remove(current);
             }
         }
         string result = new string(A);
