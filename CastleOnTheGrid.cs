@@ -17,13 +17,14 @@ class Solution {
     // Complete the minimumMoves function below.
     static int minimumMoves(string[] grid, int startX, int startY, int goalX, int goalY) {
         var n = grid.Length;
-        int distance = 0;
+        var distanceQueue = new Queue<int>();
         var NodesToVisitQueue = new Queue<Tuple<int, int>>();
         var nodesVisitedSet = new HashSet<Tuple<int, int>>();
 
         var position = new Tuple<int, int>(startX, startY);
         NodesToVisitQueue.Enqueue(position);
         nodesVisitedSet.Add(position);
+        distanceQueue.Enqueue(0);
 
         var neighbourVectors = new List<Tuple<int, int>>(){
            new Tuple<int, int>(-1, 0),
@@ -36,7 +37,7 @@ class Solution {
 
             var currentNode = NodesToVisitQueue.Peek();
             if(currentNode.Item1 == goalX && currentNode.Item2 == goalY){
-                return distance;
+                return distanceQueue.Peek();
             }
 
             for(int i = 0; i < neighbourVectors.Count; i++){
@@ -44,24 +45,28 @@ class Solution {
                 var newY = currentNode.Item2 + neighbourVectors[i].Item2;
 
 
-                while(newX > 0 && newX < n && newY > 0 && newY < n && !nodesVisitedSet.Contains(new Tuple<int,int>(newX, newY)))
+                while(newX >= 0 && newX < n && newY >= 0 && newY < n && grid[newX][newY] != 'X')
                 {
                     var neighbour = new Tuple<int, int>(newX, newY);
-                    NodesToVisitQueue.Enqueue(neighbour);
-                    distance++;
-                    nodesVisitedSet.Add(neighbour);
-
                     newX = newX + neighbourVectors[i].Item1;
                     newY = newY + neighbourVectors[i].Item2;
+
+                    if(nodesVisitedSet.Contains(neighbour)){
+                      continue;
+                    }
+
+                    NodesToVisitQueue.Enqueue(neighbour);
+                    distanceQueue.Enqueue(distanceQueue.Peek() + 1);
+                    nodesVisitedSet.Add(neighbour);
                 }
 
             }
             NodesToVisitQueue.Dequeue();
+            distanceQueue.Dequeue();
+
         }
 
         return 0;
-
-
 }
 
     static void Main(string[] args) {
