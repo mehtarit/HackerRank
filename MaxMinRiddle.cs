@@ -59,14 +59,19 @@ class Solution {
         }
 
         var result = new long[arr.Length];
+
+        
         for(int i = arr.Length -1; i >=0; i--){
             if(invertedMaxMap.ContainsKey(i+1)){
                  result[i] = invertedMaxMap[i+1];
                  continue;
                 }
-            
-            result[i] = result[i+1];
            }
+        
+        //fill gaps
+        for(int i = arr.Length -2; i >=0; i--){
+            result[i] = Math.Max(result[i], result[i+1]);
+        }
 
         return result;
     }
