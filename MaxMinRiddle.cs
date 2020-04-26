@@ -14,54 +14,60 @@ using System;
 
 class Solution {
 
-    static long GetMax(long [] arr){
-        long max = -1;
-        for(int i = 0; i < arr.Length; i++){
-            if(arr[i] > max){
-                max = arr[i];
-            }
-        }
-        return max;
-    }
-
-    static long GetMin(long [] arr){
-        long min = long.MaxValue;
-        for(int i = 0; i < arr.Length; i++){
-            if(arr[i] < min){
-                min = arr[i];
-            }
-        }
-        return min;
-    }
-
-    static long GetMaximumMin(long [] arr, int windowSize){
-        if(windowSize == 1) return GetMax(arr);
-        if(windowSize == arr.Length) return GetMin(arr);
-        long max = -1;
-        for(int i = 0; i < arr.Length - windowSize; i++){
-            long [] currentArr = new long [windowSize];
-            int start = i;
-            int end = i+windowSize -1;
-            int index = 0;
-            for(int j = start; j <=end; j++){
-               currentArr[index] = arr[j];
-               index++;
-            }
-            long currentArrMin = GetMin(currentArr);
-            if(currentArrMin > max){
-                max = currentArrMin;
-            }
-        }
-        return max;
-    }
-
     // Complete the riddle function below.
     static long[] riddle(long[] arr) {
-        long [] result = new long [arr.Length];
+        var maxWindowSizeWhereMinMap = new Dictionary<long, long>();
         for(int i = 0; i < arr.Length; i++){
-            var windowSize = i+1;
-            result[i] = GetMaximumMin(arr, windowSize);
+            long current = arr[i];
+
+            long leftWindowSize =0;
+            for(int j = i; j >=0; j--){
+                if(arr[j] < current){
+                   break;
+                }
+                leftWindowSize++;
+            }
+
+            long rightWindowSize =0;
+            for(int k = i; k < arr.Length; k++){
+                if(arr[k] < current){
+                    break;
+                }
+                rightWindowSize++;
+            }
+            long maxWindowSize = leftWindowSize + rightWindowSize -1;
+            if(maxWindowSizeWhereMinMap.ContainsKey(current)){
+                var value =maxWindowSizeWhereMinMap[current];
+                if(value < maxWindowSize){
+                    maxWindowSizeWhereMinMap[current] = maxWindowSize;
+                }
+            }
+            else maxWindowSizeWhereMinMap.Add(current, maxWindowSize);
         }
+        var invertedMaxMap = new Dictionary<long, long>();
+        foreach(var pair in maxWindowSizeWhereMinMap){
+            if(!invertedMaxMap.ContainsKey(pair.Value)){
+                invertedMaxMap.Add(pair.Value, pair.Key);
+                continue;
+            }
+            var consideringKey = pair.Value;
+            var consideringValue = pair.Key;
+            var existingValue = invertedMaxMap[consideringKey];
+            if(existingValue < consideringValue){
+                invertedMaxMap[consideringKey] = consideringValue;
+            }
+        }
+
+        var result = new long[arr.Length];
+        for(int i = arr.Length -1; i >=0; i--){
+            if(invertedMaxMap.ContainsKey(i+1)){
+                 result[i] = invertedMaxMap[i+1];
+                 continue;
+                }
+            
+            result[i] = result[i+1];
+           }
+
         return result;
     }
 
