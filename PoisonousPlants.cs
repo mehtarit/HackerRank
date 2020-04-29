@@ -21,7 +21,7 @@ class Solution {
 
         int initialNumberOfPlants = p.Length;
         int newNumberOfPlants = 0;
-        int dayCount = 0;
+        int dayCount = -1;
 
         //initialize first stack
         for(int i = 0; i < p.Length; i++){
@@ -29,6 +29,7 @@ class Solution {
         }
 
         while(initialNumberOfPlants != newNumberOfPlants){
+            dayCount++;
             initialNumberOfPlants = stack1.Count;
             while(stack1.Count !=0){
                 var current = stack1.Peek();
@@ -50,21 +51,19 @@ class Solution {
 
                 initialNumberOfPlants = newNumberOfPlants;
                 var first = stack2.Peek();
-                stack2.Pop();
                 stack1.Push(first);
-                if(stack2.Count == 0){
-                    continue;
-                    }
 
                 while(stack2.Count !=0){
                     var current = stack2.Peek();
                     stack2.Pop();
-                    var left = stack1.Peek();
-                    if(current <= left){
-                        stack1.Push(current);
+                    if(stack2.Count == 0){
+                        continue;
                     }
-                }
-                dayCount++;
+                    var left = stack2.Peek();
+                    if(left <= current){
+                        stack1.Push(left);
+                    }
+                }              
                 newNumberOfPlants = stack1.Count;
             }
             
