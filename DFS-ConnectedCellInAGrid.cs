@@ -31,18 +31,22 @@ class Solution {
         return tupleList;
     }
 
-    static int FindRegionSum(int row, int col, int[][] grid, int sum){
+    static int FindRegionSum(int row, int col, int[][] grid){
+        Console.WriteLine("row: " + row + " col: " + col);
         grid[row][col] = 0;
 
         var tupleList = GetTupleList();
+        int sum = 1;
         for(int k = 0; k < tupleList.Count; k++){
             var newrow = row + tupleList[k].x;
             var newcol = col + tupleList[k].y;
+            Console.WriteLine("newrow: " + newrow + " newcol: " + newcol);
             if(newrow < 0 || newrow > grid.Length-1) continue;
             if(newcol < 0 || newcol > grid[row].Length-1) continue;
-            if(grid[newrow][newcol] == 0) continue;
-            return FindRegionSum(newrow, newcol, grid, sum+1);
+            if(grid[newrow][newcol] == 0 ) continue;
+            sum = sum + FindRegionSum(newrow, newcol, grid);
         }
+
         return sum;
     }
 
@@ -55,7 +59,7 @@ class Solution {
             for(int j = 0; j < grid[i].Length; j++){
                 var current = grid[i][j];
                 if(current == 0) continue;
-                var regionSum = FindRegionSum(i, j, grid, 1);
+                var regionSum = FindRegionSum(i, j, grid);
                 regionSums.Add(regionSum);
             }
         }
