@@ -43,6 +43,7 @@ class Solution {
     }
 
     static void Print(Dictionary<int, List<string>> wordLengthMap){
+        Console.WriteLine("Printing Word Length Map");
           foreach(var result in wordLengthMap){
               Console.Write($"{result.Key}: ");
               foreach(var word in result.Value){
@@ -52,10 +53,51 @@ class Solution {
           }
     }
 
+    static int FindRowWordLength(string[] crossword, int i, int j){
+        var currentRow = crossword[i];
+        int count = 0;
+        for(int x=j; x < currentRow.Length; x++){
+            if(x != '-') break;
+            count++;
+        }
+        return count;
+    }
+
     static void FillMatrixMap(string[] crossword,
     Dictionary<int, List<string>> wordLengthMap, 
     Dictionary<Tuple<int, int>, char> matrixMap)
     {
+        for(int i=0; i < crossword.Length; i++){
+            var row = crossword[0];
+            int j = 0;
+            while(j < row.Length){
+                if(row[j] != '-'){
+                    j=j+1;
+                    continue;
+                }
+                if(j == row.Length-1){
+                    j=j+1;
+                    continue;
+                }
+                var currentIndex = Tuple.Create(i, j);
+                if(matrixMap.ContainsKey(currentIndex)){
+                    j=j+1;
+                    continue;
+                }
+                int wordLength = FindRowWordLength(crossword, i, j);
+                if(wordLength == 1){
+                    j=j+1;
+                    continue;
+                }
+                var wordList = wordLengthMap[wordLength];
+                if(wordList.Count == 1){
+                    //found the word - Add to matrixMap;
+                    j=j+wordLength-1;
+                    continue;
+                }
+                //What to do if the word count is more than 1
+            }
+        }
         var tuple = Tuple.Create(1, 2);
         matrixMap.Add(tuple, 'Z');
     }
@@ -64,7 +106,7 @@ class Solution {
     static string[] crosswordPuzzle(string[] crossword, string words) {
          
           var wordLengthMap = GetWordLengthMap(words);          
-          Print(wordLengthMap);
+          Print(wordLengthMap); //for debugging only
           var matrixMap = new Dictionary<Tuple<int, int>, char>();
           FillMatrixMap(crossword, wordLengthMap, matrixMap);
           return Fill(crossword,matrixMap);
